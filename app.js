@@ -4,12 +4,13 @@ const app = express();
 const layout = require('./views/layout');
 const models = require('./models');
 
-
 app.use(morgan("dev"));
+app.use('/wiki', require('./routes/wiki'));
+app.use('/user', require('./routes/user'));
 
 app.get('/', (req, res) => {
-
-  res.send(layout(''));
+  res.redirect('/wiki');
+  // res.send(layout(''));
 })
 
 const PORT = 3000;
