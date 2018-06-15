@@ -25,10 +25,29 @@ router.post('/', urlencodedParser, async (req, res, next) => {
   const content = req.body.content;
   const status = req.body.status;
 
-  const page = new Page({
+  
+  const existingUser = await User.findOne({where: {name: authorName}
+  })
+
+  const tempUser = await User.findOrCreate({
+    where: {
+      name: authorName
+    },
+    defaults: {
+      email: authorEmail
+    }
+  })
+
+  console.log('TEMPID: ', tempUser)
+
+  page = new Page({
     title,
-    content
-  });
+    content,
+    status,
+    userId: tempUser[0].id
+  })
+
+  
 
   // make sure we only redirect *after* our save is complete!
   // note: `.save` returns a promise.
@@ -36,8 +55,6 @@ router.post('/', urlencodedParser, async (req, res, next) => {
     await page.save();
     res.redirect('/');
   } catch (error) { next(error) }
-
-  res.send('POST /wiki' + [ authorName, authorEmail, title, content, status ]);
 })
 
 router.post('/', async (req, res, next) => {
